@@ -30,7 +30,7 @@
         "url": "https://github.com/foxriver76/ioBroker.denon"
     },
     "dependencies": {
-        "@iobroker/adapter-core": "^2.0.0"
+        "@iobroker/adapter-core": "^2.3.0"
     },
     "devDependencies": {
         "gulp": "^4.0.0",
