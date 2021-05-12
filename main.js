@@ -1746,8 +1746,8 @@ async function createZone(zone) {
             write: true,
             read: true,
             unit: 'dB',
-            min: -6,
-            max: 6
+            min: -100,
+            max: 100
         },
         native: {}
     }));
@@ -1785,8 +1785,8 @@ async function createZone(zone) {
             write: true,
             read: true,
             unit: 'dB',
-            min: -6,
-            max: 6
+            min: -100,
+            max: 100
         },
         native: {}
     }));
