@@ -1263,9 +1263,10 @@ async function handleResponse(data) {
         if (!multiMonitor) { // make sure that state exists
             await createMonitorState();
         }
+
         adapter.setState('settings.videoProcessingMode', processingMode, true);
         return;
-    } else if (command.startsWith('PV')) {
+    } else if (command.startsWith('PV') && command.length > 2) {
         const pictureMode = data.substring(1);
 
         if (!pictureModeAbility) {
@@ -1438,13 +1439,12 @@ async function handleResponse(data) {
             break;
         }
         case 'ZPSTRE': {
-            const state = data.split(' ')[1];
+            const state = parseFloat(data.split(' ')[1]);
             adapter.setState(`zone${zoneNumber}.equalizerTreble`, state, true);
             break;
-
         }
         case 'ZPSBAS': {
-            const state = data.split(' ')[1];
+            const state = parseFloat(data.split(' ')[1]);
             adapter.setState(`zone${zoneNumber}.equalizerBass`, state, true);
             break;
         }
@@ -1658,12 +1658,12 @@ async function createZone(zone) {
         native: {}
     }));
 
-    promises.push(adapter.setObjectNotExistsAsync(`zone${zone}.selectInput`, {
+    promises.push(adapter.extendObjectAsync(`zone${zone}.selectInput`, {
         type: 'state',
         common: {
             name: `Zone ${zone} Select input`,
             role: 'media.input',
-            type: 'number',
+            type: 'string',
             write: true,
             read: true,
             states: {
@@ -1694,7 +1694,7 @@ async function createZone(zone) {
             }
         },
         native: {}
-    }));
+    }, {preserve: {common: ['name']}}));
 
     promises.push(adapter.setObjectNotExistsAsync(`zone${zone}.muteIndicator`, {
         type: 'state',
@@ -2021,12 +2021,12 @@ async function createMonitorState() {
         native: {}
     }));
 
-    promises.push(adapter.setObjectNotExistsAsync('settings.videoProcessingMode', {
+    promises.push(adapter.extendObjectAsync('settings.videoProcessingMode', {
         type: 'state',
         common: {
             name: 'Video processing mode',
             role: 'video.processingMode',
-            type: 'number',
+            type: 'string',
             write: true,
             read: true,
             states: {
@@ -2036,7 +2036,7 @@ async function createMonitorState() {
             }
         },
         native: {}
-    }));
+    }, {preserve: {common: ['name']}}));
     try {
         await Promise.all(promises);
         if (!multiMonitor) {
@@ -2241,7 +2241,7 @@ async function createStandardStates(type) {
         for (const obj of helper.commonCommands) {
             const id = obj._id;
             delete obj._id;
-            promises.push(adapter.setObjectNotExistsAsync(id, obj));
+            promises.push(adapter.extendObjectAsync(id, obj, {preserve: {common: ['name']}}));
         } // endFor
         try {
             await Promise.all(promises);
@@ -2253,7 +2253,7 @@ async function createStandardStates(type) {
         for (const obj of helper.usCommands) {
             const id = obj._id;
             delete obj._id;
-            promises.push(adapter.setObjectNotExistsAsync(id, obj));
+            promises.push(adapter.extendObjectAsync(id, obj, {preserve: {common: ['name']}}));
         } // endFor
 
         for (let i = 1; i <= 6; i++) { // iterate over zones
